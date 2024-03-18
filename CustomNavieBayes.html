@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="tr">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Navie Bayes Prediction Algorithm</title>
+    <style>
+        body {
+            background-color: black;
+            color: white;
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+
+        #status {
+            padding: 10px;
+            position: fixed;
+            bottom: 10px;
+            right: 10px;
+            border: 1px solid white;
+            border-radius: 5px;
+        }
+
+        #totalvar {
+            padding: 10px;
+            position: fixed;
+            top: 10px;
+            right: 10px;
+            border: 1px solid white;
+            border-radius: 5px;
+        }
+
+        .info {
+            margin-bottom: 5px;
+        }
+    </style>
+</head>
+
+<body>
+    <h3>Navie Bayes Algorithm</h3>
+    <div id="status">
+        <div id="lastAction" class="info">Last Action: null</div>
+        <div id="prediction" class="info">Prediction: null</div>
+        <div id="accuracy" class="info">Accuracy: null </div>
+    </div>
+
+    <div id="totalvar">
+        <div id="dataset" class="info">Dataset: null</div>
+        <div id="totalLefts" class="info">Total Left Clicks: null</div>
+        <div id="totalRights" class="info">Total Right Clicks: null</div>
+        <div id="totalClicks" class="info">Total Clicks: null </div>
+        <div id="totalCorrects" class="info">Correct Predictions: null </div>
+
+
+    </div>
+
+    <script>
+
+        let totalClicks = 0;
+        let correctPredictions = 0;
+        let totalRightClicks = 0;
+        let totalLeftClicks = 0;
+        let dataCounter = 0;
+        let matrixRow = 100;
+        let matrixColumn = 5;
+        let currentRow = 0;
+        let currentColumn = 0;
+        let matrix = [];
+        let isMatrixCreated = false;
+
+        function updateDisplay(action, prediction, accuracy) {
+            if (action === 1) {
+                totalRightClicks++;
+                action = 'Right';
+            }
+            else {
+                totalLeftClicks++;
+                action = 'Left';
+            }
+            if (prediction === 0) {
+                prediction = 'Left';
+            }
+            else if (prediction === 1) {
+                prediction = 'Right';
+            }
+            if (dataCounter < 50) {
+                document.getElementById('dataset').textContent = `Dataset: ${dataCounter}`;
+            }
+
+            document.getElementById('lastAction').textContent = `Last Action: ${action}`;
+            document.getElementById('prediction').textContent = `Prediction: ${prediction}`;
+            document.getElementById('accuracy').textContent = `Accuracy: %${accuracy}`;
+            document.getElementById('totalLefts').textContent = `Total Left Clicks: ${totalLeftClicks}`;
+            document.getElementById('totalRights').textContent = `Total Right Clicks: ${totalRightClicks}`;
+            document.getElementById('totalClicks').textContent = `Total Clicks: ${totalClicks}`;
+            document.getElementById('totalCorrects').textContent = `Correct Predictions: ${correctPredictions}`;
+        }
+
+
+        function calculateAccuracy(prediction, action) {
+            if (prediction === action) {
+                correctPredictions++;
+            }
+            return ((correctPredictions * 100) / totalClicks).toFixed(2);
+        }
+
+        function createMatrix(matrixRow, matrixColumn) {
+            matrix.push(new Array(matrixColumn))
+            isMatrixCreated = true;
+        }
+
+        function setDataToMatrix(action) {
+            matrix[currentRow][currentColumn] = action;
+            currentColumn++;
+            if (currentColumn === matrixColumn) {
+                currentColumn = 0;
+                currentRow = currentRow + 1;
+                matrix.push(new Array(matrixColumn))
+            }
+        }
+
+        function copyRow(array) {
+            for (let i = 1; i < 5; i++) {
+                matrix[currentRow][i - 1] = matrix[currentRow - 1][i];
+            }
+            currentColumn = 4;
+        }
+
+        function calculateProbability(column, clickType, EColumnId) {
+            var total = 0;
+            var count = 0;
+            for (var i = 0; i < currentRow; i++) {
+                if (matrix[i][4] === EColumnId) {
+                    if (matrix[i][column] === clickType) {
+                        count++;
+                    }
+                    total++;
+                }
+            }
+            var result = count / total;
+            return result === 0 ? 0.001 : count / total;
+        }
+
+        function calculateEColumn(actionId) {
+            var total = 0;
+            var count = 0;
+            for (var i = 0; i < currentRow; i++) {
+                if (matrix[i][4] === actionId) {
+                    count++;
+                }
+                total++;
+            }
+            var result = count / total;
+            return result === 0 ? 0.001 : count / total;
+        }
+
+        function predictClick(probLeft, probRight) {
+            if (probLeft >= probRight) {
+                return 0;
+            }
+            return 1;
+        }
+
+        function calculations(action) {
+            if (!isMatrixCreated) {
+                createMatrix(matrixRow, matrixColumn);
+            }
+            if (dataCounter < 49) {
+                setDataToMatrix(action);
+                dataCounter++;
+                updateDisplay(action, 'None', 0);
+                return
+            }
+            totalClicks++;
+
+            var probALeft = calculateProbability(0, matrix[currentRow][0], 0);
+            var probARight = calculateProbability(0, matrix[currentRow][0], 1);
+
+            var probBLeft = calculateProbability(1, matrix[currentRow][1], 0);
+            var probBRight = calculateProbability(1, matrix[currentRow][1], 1);
+
+            var probCLeft = calculateProbability(2, matrix[currentRow][2], 0);
+            var probCRight = calculateProbability(2, matrix[currentRow][2], 1);
+
+            var probDLeft = calculateProbability(3, matrix[currentRow][3], 0);
+            var probDRight = calculateProbability(3, matrix[currentRow][3], 1);
+
+            var probELeft = calculateEColumn(0);
+            var probERight = calculateEColumn(1);
+
+            probRight = probARight * probBRight * probCRight * probDRight * probERight;
+            probLeft = probALeft * probBLeft * probCLeft * probDLeft * probELeft;
+
+            var prediction = predictClick(probLeft, probRight);
+            let accuracy = calculateAccuracy(prediction, action);
+            updateDisplay(action, prediction, accuracy);
+            setDataToMatrix(action);
+            copyRow();
+        }
+
+        document.addEventListener('click', (event) => {
+            let action = 0;
+            calculations(action);
+        });
+
+        document.addEventListener('contextmenu', function (event) {
+            event.preventDefault();
+            let action = 1;
+            calculations(action);
+        });
+
+    </script>
+
+</body>
+
+</html>

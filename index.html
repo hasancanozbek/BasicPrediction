@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="tr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Main Page</title>
+    <style>
+        body,
+        html {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            height: 100%;
+            background-color: black;
+        }
+
+        .container {
+            display: flex;
+            height: 100%;
+        }
+
+        .sidebar {
+            width: 100%;
+            display: flex;
+            flex-wrap: wrap;
+            padding: 20px;
+            background-color: rgba(255, 255, 255, 0.5);
+        }
+
+        .page {
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            align-items: center;
+            flex: 1;
+            margin-right: 20px;
+            padding-bottom: 10px;
+        }
+
+        .page h2,
+        .page p {
+            margin: 0 0 5px 0;
+            color: white;
+        }
+
+        button {
+            cursor: pointer;
+            padding: 10px 20px;
+            margin-top: 10px;
+            border: none;
+            background-color: #007BFF;
+            color: white;
+            border-radius: 5px;
+            font-size: 16px;
+        }
+
+        button:hover {
+            background-color: #0056b3;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <div class="sidebar">
+            <div class="page">
+                <h2>My Algorithm</h2>
+                <p>Without using a data set, the algorithm I developed looks at the probabilities of the user's past
+                    total right and left clicks and predicts the highest one.</p>
+                <button onclick="location.href='MyAlgorithm.html'">Open</button>
+            </div>
+            <div class="page">
+                <h2>Custom Navie Bayes</h2>
+                <p>It is a partially customized version of the Navie Bayes algorithm. It first receives 49 clicks from
+                    the user on a 5xN matrix. Then the model is trained according to these clicks and Bayes theorem is
+                    applied. For 5 columns, probabilities are calculated and clicks are predicted according to the
+                    magnitude of the result.</p>
+                <button onclick="location.href='CustomNavieBayes.html'">Open</button>
+            </div>
+        </div>
+    </div>
+</body>
+
+</html>

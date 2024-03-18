@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>My Prediction Algorithm</title>
+    <style>
+        body {
+            background-color: black;
+            color: white;
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+
+        .statistics,
+        .predictions {
+            position: absolute;
+            padding: 10px;
+            border: 1px solid white;
+            border-radius: 5px;
+        }
+
+        .statistics {
+            top: 10px;
+            right: 10px;
+        }
+
+        .predictions {
+            bottom: 10px;
+            right: 10px;
+        }
+    </style>
+</head>
+
+<body>
+    <h3>My Algorithm</h3>
+    <div class="statistics">
+        <div id="rightClicks">Total Right Clicks: 0</div>
+        <div id="leftClicks">Total Left Clicks: 0</div>
+        <div id="totalClicks">Total Clicks: 0</div>
+        <div id="correctPredictions">Correct Predictions: 0</div>
+    </div>
+
+    <div class="predictions">
+        <div id="lastClick">Last Click: None</div>
+        <div id="predictedClick">Prediction: None</div>
+        <div id="accuracy">Accuracy: None</div>
+    </div>
+
+    <script>
+        let totalRightClicks = 0, totalLeftClicks = 0, totalClicks = 0, correctPredictions = 0;
+        let lastPrediction = null;
+
+        document.addEventListener('contextmenu', function (event) {
+            event.preventDefault();
+            processClick('right');
+            return false;
+        }, false);
+
+        document.addEventListener('click', function (event) {
+            processClick('left');
+        }, false);
+
+        function processClick(clickType) {
+            updateStatistics(clickType);
+            let prediction = predictClick();
+            updatePredictions(clickType, prediction);
+            displayStatisticsAndPredictions(clickType, prediction);
+        }
+
+        function updateStatistics(clickType) {
+            totalClicks++;
+            if (clickType === 'right') totalRightClicks++;
+            else totalLeftClicks++;
+        }
+
+        function predictClick() {
+            if (totalRightClicks > totalLeftClicks) return 'right';
+            else return 'left';
+        }
+
+        function updatePredictions(clickType, prediction) {
+            if (prediction === clickType) correctPredictions++;
+            lastPrediction = prediction;
+        }
+
+        function displayStatisticsAndPredictions(clickType, prediction) {
+            document.getElementById('rightClicks').textContent = 'Total Right Clicks: ' + totalRightClicks;
+            document.getElementById('leftClicks').textContent = 'Total Left Clicks: ' + totalLeftClicks;
+            document.getElementById('totalClicks').textContent = 'Total Clicks: ' + totalClicks;
+            document.getElementById('correctPredictions').textContent = 'Correct Predictions: ' + correctPredictions;
+            document.getElementById('lastClick').textContent = 'Last Click: ' + clickType;
+            document.getElementById('predictedClick').textContent = 'Prediction: ' + prediction;
+            let accuracy = totalClicks > 0 ? (correctPredictions / totalClicks) * 100 : 0;
+            document.getElementById('accuracy').textContent = 'Accuracy: ' + accuracy.toFixed(2) + '%';
+        }
+    </script>
+
+</body>
+
+</html>
